@@ -2,15 +2,15 @@
 // Mahdi Salehi
 
 const http = require("http")
+const { broadcastIp } = require("./utils/findBroadcastIp")
 
 
-
-const port = process.env.PORT ?? 8000
+const port = process.env.PORT ?? 5000
 
 function sendMessage(message) {
   let targetPort = (port == 5000)? 5001 : 5000
 
-  fetch(`http://0.0.0.0:${targetPort}/reciveMessage`, {
+  fetch(`http://${broadcastIp}:${targetPort}/reciveMessage`, {
     method: "POST",
     headers: {
       "Content-type": "application/json",
