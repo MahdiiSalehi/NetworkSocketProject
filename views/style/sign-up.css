@@ -1,0 +1,18 @@
+/* In the name of ALLAH!
+Mahdi Salehi */
+
+body {
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+}
+.card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+}
+.btn {
+  background: linear-gradient(90deg, #4f46e5, #3b82f6);
+  transition: transform 500ms, box-shadow 500ms;
+}
+.btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}

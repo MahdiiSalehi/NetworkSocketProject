@@ -4,7 +4,7 @@
 const dgram = require('dgram');
 const { EventEmitter } = require('stream');
 
-const { broadcastSenderPort, broadcastListenPort } = require('../config/config');
+const { Ports } = require('../config/config');
 
 
 
@@ -13,8 +13,8 @@ class BroadcastSender extends EventEmitter {
     super()
 
     this.BROADCAST_ADDR = '255.255.255.255';
-    this.PORT_TO_RUN = broadcastSenderPort;
-    this.PORT_TO_SEND = broadcastListenPort;
+    this.PORT_TO_RUN = Ports.broadcastSenderPort;
+    this.PORT_TO_SEND = Ports.broadcastListenPort;
 
     this.sender = dgram.createSocket('udp4');
 
@@ -55,7 +55,7 @@ class BroadcastReceiver extends EventEmitter {
     super()
 
     this.receiver = dgram.createSocket('udp4')
-    this.PORT_LISTEN = broadcastListenPort
+    this.PORT_LISTEN = Ports.broadcastListenPort
 
     this.receiver.on("message", (msg, rinfo) => {
       let parsedMessage

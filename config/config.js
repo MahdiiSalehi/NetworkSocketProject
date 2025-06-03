@@ -1,11 +1,19 @@
 // In the name of ALLAH!
 // Mahdi Salehi
 
-const config = {
-  broadcastSenderPort: 5000,
-  broadcastListenPort: 5001
+const Ports = {
+  appRunPort: 5000,
+  broadcastSenderPort: 5001,
+  broadcastListenPort: 5002
+}
+
+const Routes = {
+  signup: "/sign-up",
+  dashboard: "/dashboard"
 }
 
 
-
-module.exports = config
+module.exports = {
+  Ports,
+  Routes
+}

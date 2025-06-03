@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ثبت نام</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="sign-up.css">
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+  <!-- Toast container for backend errors -->
+  <div id="backendError" class="fixed top-4 right-4 bg-red-500 text-white px-5 py-3 rounded shadow opacity-0 pointer-events-none transition-all duration-500"></div>
+
+  <div class="card p-10 rounded-2xl shadow-2xl w-full max-w-sm transform transition duration-500 hover:scale-105">
+    <h1 class="text-3xl font-bold text-center mb-8 text-indigo-700 tracking-wider">خوش آمدید</h1>
+    <form id="signupForm" novalidate method="post">
+      <div class="mb-2">
+        <input 
+          type="text" 
+          id="name" 
+          name="name" 
+          required 
+          placeholder="نام خود را وارد کنید" 
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg transition duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+      </div>
+      <div id="errorMsg" class="text-sm text-red-600 text-center mb-4 hidden">
+        لطفاً یک نام معتبر وارد کنید. تنها کاراکترهای فارسی مجاز هستند.
+      </div>
+      <button type="submit" class="btn w-full py-3 text-white font-semibold rounded-lg shadow-lg">
+        ورود
+      </button>
+    </form>
+  </div>
+  <script src="sign-up.js"></script>
+</body>
+</html>
