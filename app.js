@@ -9,6 +9,10 @@ const WebSocket = require("ws")
 const { Ports, Routes } = require("./config/config")
 const checkAuthentication = require("./src/auth/checkAuthentication")
 const signup = require("./src/auth/sign-up")
+const UserSession = require("./src/model/user_session/schema")
+const sendMyInfoPeriodically = require("./src/find_users/sendMyInfo")
+const receiveUserInfo = require("./src/find_users/receiveUserInfo")
+const getIpAddress = require("./src/utils/getIpAddress")
 
 mongoose.connect("mongodb://localhost:27017/")
 
@@ -19,6 +23,9 @@ app.use(express.static("views/style")) // css files
 app.use(express.static("views/script")) // js files
 
 const viewsPath = path.join(__dirname, "views/html");
+
+let onlineUsers = []
+let tmpOnlineUsers = []
 
 
 app.use(async (req, res, next) => {
@@ -70,6 +77,11 @@ app.get(Routes.dashboard, (req, res) => {
   res.sendFile("dashboard.html", { root: viewsPath })
 })
 
+app.get(Routes.userSession, async (req, res) => {
+  const data = (await UserSession.findOne({})).userData
+  res.send(data)
+})
+
 
 app.use((req, res) => {
   res.status(404).sendFile("404.html", { root: viewsPath })
@@ -80,14 +92,36 @@ const port = process.env.PORT ?? Ports.appRunPort
 const server = app.listen(port)
 
 const wsServer = new WebSocket.Server({ server })
-
+let wsSend
+/*
+{
+  action: {
+    get: [sendMessage],
+    send: [receivedMessage, onlineUsers]
+  },
+  data: data
+}
+*/
 wsServer.on("connection", ws => {
   console.log("websocket Connected!")
 
   ws.on("message", message => {
-    console.log("New Message:", message.toString())
+    let data
 
-    ws.send(`Received Message: ${message}`)
+    try {
+      data = JSON.parse(message.toString())
+    } catch (err) {
+      console.log("Error Parsing Received Data:", err)
+      return
+    }
+
+    switch (data.action) {
+      case "sendMessage":
+        break
+      
+      default:
+        console.log("Undefined Command!, ", data)
+    }
   })
 
   ws.on('close', () => {
@@ -97,4 +131,42 @@ wsServer.on("connection", ws => {
   ws.on('error', (err) => {
     console.error("خطای وب‌سوکت:", err)
   })
+
+  wsSend = (data) => {
+    if (ws.readyState == ws.OPEN) {
+      ws.send(JSON.stringify(data))
+    }
+  }
 })
+
+
+
+
+sendMyInfoPeriodically(5000)
+receiveUserInfo(data => {
+  if (data.ip != getIpAddress()) {
+    console.log("founded User: ", data.ip)
+
+    tmpOnlineUsers.push(data)
+  }
+})
+
+setInterval(() => {
+  onlineUsers = []
+
+  tmpOnlineUsers.forEach(item => {
+    onlineUsers.push({
+      username: item.message.username,
+      userId: item.message.userId
+    })
+  })
+
+  tmpOnlineUsers = []
+
+  if (wsSend) {
+    wsSend({
+      action: "onlineUsers",
+      data: onlineUsers
+    })
+  }
+}, 10000)

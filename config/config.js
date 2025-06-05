@@ -9,7 +9,8 @@ const Ports = {
 
 const Routes = {
   signup: "/sign-up",
-  dashboard: "/dashboard"
+  dashboard: "/dashboard",
+  userSession: "/user-session"
 }
 
 

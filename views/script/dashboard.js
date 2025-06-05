@@ -10,6 +10,7 @@ const chatMessagesViewElem = $.querySelector("#chat-view")
 const chatHistoryListElem = $.querySelector("#chat-history-list")
 const sendMsgBtn = $.querySelector("#send-msg-btn")
 const inputMsgElem = $.querySelector("#input-msg")
+const currUserElem = $.querySelector("#curr-user")
 
 const chatHistoryUsers = [
   { _id: 0, username: "علی", imgSrc: "https://media.istockphoto.com/id/471926619/photo/moraine-lake-at-sunrise-banff-national-park-canada.jpg?s=612x612&w=0&k=20&c=mujiCtVk5QA697SD3d8V8BGmd91-8HlxCNHkolEA0Bo="},
@@ -26,12 +27,11 @@ initDashboard()
 
 function chatOnlineItemTemplate(user) {
   return (`
-    <li data-userid=${user._id} class="user-item flex items-center space-x-2 p-2 border rounded hover:bg-gray-100 cursor-pointer">
+    <li data-userid=${user.userId} class="user-item flex items-center space-x-2 p-2 border rounded hover:bg-gray-100 cursor-pointer">
       <div class="w-8 h-8 bg-gray-300 rounded-full overflow-hidden me-1">
         <img
           class="w-full h-full object-cover"
           src=${user.imgSrc}
-          alt="Sample Image"
         />
       </div>
       <span>${user.username}</span>
@@ -39,12 +39,12 @@ function chatOnlineItemTemplate(user) {
   `)
 }
 
-function chatOnlineViewHandler() {
-  const chatOnlineUsers = [
-    { _id: 0, username: "علی", imgSrc: "https://media.istockphoto.com/id/471926619/photo/moraine-lake-at-sunrise-banff-national-park-canada.jpg?s=612x612&w=0&k=20&c=mujiCtVk5QA697SD3d8V8BGmd91-8HlxCNHkolEA0Bo="},
-    { _id: 1, username: "مریم", imgSrc: "https://media.istockphoto.com/id/471926619/photo/moraine-lake-at-sunrise-banff-national-park-canada.jpg?s=612x612&w=0&k=20&c=mujiCtVk5QA697SD3d8V8BGmd91-8HlxCNHkolEA0Bo="},
-    { _id: 2, username: "رضا", imgSrc: "https://media.istockphoto.com/id/471926619/photo/moraine-lake-at-sunrise-banff-national-park-canada.jpg?s=612x612&w=0&k=20&c=mujiCtVk5QA697SD3d8V8BGmd91-8HlxCNHkolEA0Bo="},
-  ]
+function chatOnlineViewHandler(chatOnlineUsers) {
+  // const chatOnlineUsers = [
+  //   { _id: 0, username: "علی", imgSrc: "https://media.istockphoto.com/id/471926619/photo/moraine-lake-at-sunrise-banff-national-park-canada.jpg?s=612x612&w=0&k=20&c=mujiCtVk5QA697SD3d8V8BGmd91-8HlxCNHkolEA0Bo="},
+  //   { _id: 1, username: "مریم", imgSrc: "https://media.istockphoto.com/id/471926619/photo/moraine-lake-at-sunrise-banff-national-park-canada.jpg?s=612x612&w=0&k=20&c=mujiCtVk5QA697SD3d8V8BGmd91-8HlxCNHkolEA0Bo="},
+  //   { _id: 2, username: "رضا", imgSrc: "https://media.istockphoto.com/id/471926619/photo/moraine-lake-at-sunrise-banff-national-park-canada.jpg?s=612x612&w=0&k=20&c=mujiCtVk5QA697SD3d8V8BGmd91-8HlxCNHkolEA0Bo="},
+  // ]
 
   let chatOnlineHTML = ''
 
@@ -113,7 +113,6 @@ function chatHistoryItemTemplate(user) {
         <img
           class="w-full h-full object-cover"
           src=${user.imgSrc}
-          alt="Sample Image"
         />
       </div>
       <span>${user.username}</span>
@@ -141,8 +140,19 @@ function initWebSocket() {
 
   ws.onmessage = event => {
     const message = event.data
+    const data = JSON.parse(message)
 
-    console.log("Received Message:", message)
+    switch (data.action) {
+      case "onlineUsers":
+        chatOnlineViewHandler(data.data)
+        break
+
+      default:
+        console.log("Undefined Command!, Received Message: ", data)
+    }
+
+
+    // console.log("Received Message:", JSON.parse(message))
   }
 
   ws.onerror = err => {
@@ -163,8 +173,18 @@ function getOnlineUsers() {
 }
 
 
+function getCurrUserInfo() {
+  fetch("/user-session")
+    .then(res => res.json())
+    .then(userInfo => {
+      currUserElem.textContent = userInfo.username
+    })
+}
+
+
 function initDashboard() {
-  chatOnlineViewHandler()
+  getCurrUserInfo()
+  chatOnlineViewHandler([])
   chatHistoryViewHandler()
   chatMessagesViewHandler()
 

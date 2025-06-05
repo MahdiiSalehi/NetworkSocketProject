@@ -4,7 +4,7 @@
 const dgram = require('dgram');
 const { EventEmitter } = require('stream');
 
-const { Ports } = require('../config/config');
+const { Ports } = require('../../config/config');
 
 
 
