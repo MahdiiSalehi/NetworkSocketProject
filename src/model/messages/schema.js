@@ -19,7 +19,7 @@ const messageSchema = new mongoose.Schema({
     required: true
   },
   content: {
-    type: String  // در صورت پیام متنی می‌توانید مستقیماً متن را ذخیره کنید؛ در غیر این صورت لینک فایل در این فیلد ذخیره شود.
+    type: String
   },
   createdAt: {
     type: Date,

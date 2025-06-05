@@ -1,14 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>داشبورد</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <link rel="stylesheet" href="dashboard.css">
+
 </head>
-<body>
-  
+<body class="bg-gray-100 font-sans">
+  <!-- Header -->
+  <header class="bg-blue-600 text-white py-4 px-6">
+    <h1 class="text-2xl font-bold">داشبورد</h1>
+  </header>
+
+  <!-- Main content -->
+  <main class="flex flex-col lg:flex-row h-[calc(100vh-64px)]">
+    
+    <!-- Chat History Section -->
+    <section class="bg-white lg:w-1/4 border-r p-4 overflow-y-auto">
+      <h2 class="text-xl font-semibold mb-4">سابقه گفتگوها</h2>
+      <ul class="space-y-2" id="chat-history-list">
+        <li class="p-2 border rounded hover:bg-gray-100 cursor-pointer">گفتگو با علی</li>
+        <li class="p-2 border rounded hover:bg-gray-100 cursor-pointer">گفتگو با مریم</li>
+        <li class="p-2 border rounded hover:bg-gray-100 cursor-pointer">گفتگو با رضا</li>
+        <!-- Add more chat histories here -->
+      </ul>
+    </section>
+    
+    <!-- Current Chat Section -->
+    <section class="flex-1 flex flex-col p-4">
+      <div class="flex-1 bg-white p-4 rounded-lg shadow overflow-y-auto">
+        <h2 class="text-xl font-semibold mb-4" id="curr-chat-title">گفتگوی جاری</h2>
+          <!-- Chat messages container -->
+          <div class="space-y-4" id="chat-view">
+            <div class="flex items-start">
+              <div class="bg-blue-100 text-blue-900 p-2 rounded-lg max-w-xs">
+                سلام، چطوری؟
+              </div>
+            </div>
+            <div class="flex items-end justify-end">
+              <div class="bg-green-100 text-green-900 p-2 rounded-lg max-w-xs">
+                خوبم، ممنون!
+              </div>
+            </div>
+            <!-- More messages -->
+          </div>
+      </div>
+      <!-- Message form -->
+      <form class="mt-4 flex" onsubmit="return false;">
+        <input id="input-msg" type="text" placeholder="پیام خود را وارد کنید..." class="flex-1 py-2 px-4 me-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button id="send-msg-btn" type="submit" class="bg-blue-600 text-white px-4 rounded-lg hover:bg-blue-700 transition">
+          ارسال
+        </button>
+      </form>
+    </section>
+    
+    <!-- Online Users Section -->
+    <section class="bg-white lg:w-1/4 border-l p-4 overflow-y-auto">
+      <h2 class="text-xl font-semibold mb-4">کاربران آنلاین</h2>
+      <ul class="space-y-2" id="chat-online-list">
+        <li class="flex items-center space-x-2 p-2 border rounded">
+          <div class="w-8 h-8 bg-gray-300 rounded-full overflow-hidden me-1">
+            <img
+              class="w-full h-full object-cover"
+              src="https://media.istockphoto.com/id/471926619/photo/moraine-lake-at-sunrise-banff-national-park-canada.jpg?s=612x612&w=0&k=20&c=mujiCtVk5QA697SD3d8V8BGmd91-8HlxCNHkolEA0Bo="
+              alt="Sample Image"
+            />
+          </div>
+          <span>علی</span>
+        </li>
+        <li class="flex items-center space-x-2 p-2 border rounded">
+          <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+          <span>مریم</span>
+        </li>
+        <li class="flex items-center space-x-2 p-2 border rounded">
+          <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+          <span>رضا</span>
+        </li>
+        <!-- Add more online users here -->
+      </ul>
+    </section>
+
+  </main>
   <script src="dashboard.js"></script>
 </body>
 </html>

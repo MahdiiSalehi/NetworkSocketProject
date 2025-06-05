@@ -4,6 +4,7 @@
 const path = require("path")
 const express = require("express")
 const mongoose = require("mongoose")
+const WebSocket = require("ws")
 
 const { Ports, Routes } = require("./config/config")
 const checkAuthentication = require("./src/auth/checkAuthentication")
@@ -26,6 +27,10 @@ app.use(async (req, res, next) => {
   } else {
     res.status(302).redirect(Routes.signup)
   }
+})
+
+app.get("/", (req, res) => {
+  res.status(302).redirect(Routes.dashboard)
 })
 
 
@@ -66,7 +71,30 @@ app.get(Routes.dashboard, (req, res) => {
 })
 
 
+app.use((req, res) => {
+  res.status(404).sendFile("404.html", { root: viewsPath })
+})
 
 
 const port = process.env.PORT ?? Ports.appRunPort
-app.listen(port)
+const server = app.listen(port)
+
+const wsServer = new WebSocket.Server({ server })
+
+wsServer.on("connection", ws => {
+  console.log("websocket Connected!")
+
+  ws.on("message", message => {
+    console.log("New Message:", message.toString())
+
+    ws.send(`Received Message: ${message}`)
+  })
+
+  ws.on('close', () => {
+    console.log("یک کلاینت قطع اتصال کرد")
+  })
+
+  ws.on('error', (err) => {
+    console.error("خطای وب‌سوکت:", err)
+  })
+})
