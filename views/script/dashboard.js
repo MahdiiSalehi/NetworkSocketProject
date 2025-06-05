@@ -147,6 +147,9 @@ function initWebSocket() {
         chatOnlineViewHandler(data.data)
         break
 
+      case "receivedMessage":
+        break
+
       default:
         console.log("Undefined Command!, Received Message: ", data)
     }
@@ -165,11 +168,6 @@ function initWebSocket() {
 
   // setInterval(() => (ws.readyState == ws.OPEN)? ws.send("BUSI") : undefined, 500)
 
-}
-
-
-function getOnlineUsers() {
-  
 }
 
 

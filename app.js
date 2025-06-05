@@ -4,7 +4,7 @@
 const path = require("path")
 const express = require("express")
 const mongoose = require("mongoose")
-const WebSocket = require("ws")
+
 
 const { Ports, Routes } = require("./config/config")
 const checkAuthentication = require("./src/auth/checkAuthentication")
@@ -13,6 +13,10 @@ const UserSession = require("./src/model/user_session/schema")
 const sendMyInfoPeriodically = require("./src/find_users/sendMyInfo")
 const receiveUserInfo = require("./src/find_users/receiveUserInfo")
 const getIpAddress = require("./src/utils/getIpAddress")
+const privateChatExist = require("./src/chat_handlers/privateChatExist")
+const startNewChat = require("./src/chat_handlers/startNewChat")
+const registerNewMessage = require("./src/chat_handlers/registerNewMessage")
+const MyWebSocket = require("./src/web_socket/webSocket")
 
 mongoose.connect("mongodb://localhost:27017/")
 
@@ -88,11 +92,10 @@ app.use((req, res) => {
 })
 
 
-const port = process.env.PORT ?? Ports.appRunPort
+const port = Ports.appRunPort
 const server = app.listen(port)
 
-const wsServer = new WebSocket.Server({ server })
-let wsSend
+const ws = new MyWebSocket(server)
 /*
 {
   action: {
@@ -102,44 +105,6 @@ let wsSend
   data: data
 }
 */
-wsServer.on("connection", ws => {
-  console.log("websocket Connected!")
-
-  ws.on("message", message => {
-    let data
-
-    try {
-      data = JSON.parse(message.toString())
-    } catch (err) {
-      console.log("Error Parsing Received Data:", err)
-      return
-    }
-
-    switch (data.action) {
-      case "sendMessage":
-        break
-      
-      default:
-        console.log("Undefined Command!, ", data)
-    }
-  })
-
-  ws.on('close', () => {
-    console.log("یک کلاینت قطع اتصال کرد")
-  })
-
-  ws.on('error', (err) => {
-    console.error("خطای وب‌سوکت:", err)
-  })
-
-  wsSend = (data) => {
-    if (ws.readyState == ws.OPEN) {
-      ws.send(JSON.stringify(data))
-    }
-  }
-})
-
-
 
 
 sendMyInfoPeriodically(5000)
@@ -163,8 +128,8 @@ setInterval(() => {
 
   tmpOnlineUsers = []
 
-  if (wsSend) {
-    wsSend({
+  if (ws.send) {
+    ws.send({
       action: "onlineUsers",
       data: onlineUsers
     })

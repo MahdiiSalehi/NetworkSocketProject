@@ -16,7 +16,7 @@ const messageSchema = new mongoose.Schema({
   messageType: {
     type: String,
     enum: ['text', 'media'],
-    required: true
+    default: 'text'
   },
   content: {
     type: String

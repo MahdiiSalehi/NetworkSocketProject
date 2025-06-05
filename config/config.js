@@ -2,9 +2,9 @@
 // Mahdi Salehi
 
 const Ports = {
-  appRunPort: 5000,
-  broadcastSenderPort: 5001,
-  broadcastListenPort: 5002
+  appRunPort: process.env.appRunPort ?? 5000,
+  broadcastSenderPort: process.env.broadcastSenderPort ?? 5001,
+  broadcastListenPort: process.env.broadcastListenPort ?? 5002
 }
 
 const Routes = {
