@@ -13,7 +13,7 @@ class BroadcastSender extends EventEmitter {
     super()
 
     this.BROADCAST_ADDR = '255.255.255.255';
-    this.PORT_TO_RUN = Ports.broadcastSenderPort;
+    this.PORT_TO_RUN = Ports.broadcastSendPort;
     this.PORT_TO_SEND = Ports.broadcastListenPort;
 
     this.sender = dgram.createSocket('udp4');

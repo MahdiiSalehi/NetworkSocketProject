@@ -18,7 +18,7 @@ async function startNewChat(userId1, userId2) {
       createdBy: userId1
     });
 
-    await ChatParticipant.create([
+    const newChatParticipant = await ChatParticipant.create([
       {
         chatId: newChat._id,
         userId: userId1
@@ -30,6 +30,7 @@ async function startNewChat(userId1, userId2) {
     ]);
 
     console.log('New chat successfully registered:', newChat);
+    console.log('New chat Participant successfully registered:', newChatParticipant);
     return newChat;
   } catch (error) {
     console.error('Error registering new chat:', error);

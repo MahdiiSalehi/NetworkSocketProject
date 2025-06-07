@@ -10,13 +10,10 @@ const { Ports, Routes } = require("./config/config")
 const checkAuthentication = require("./src/auth/checkAuthentication")
 const signup = require("./src/auth/sign-up")
 const UserSession = require("./src/model/user_session/schema")
-const sendMyInfoPeriodically = require("./src/find_users/sendMyInfo")
-const receiveUserInfo = require("./src/find_users/receiveUserInfo")
-const getIpAddress = require("./src/utils/getIpAddress")
-const privateChatExist = require("./src/chat_handlers/privateChatExist")
-const startNewChat = require("./src/chat_handlers/startNewChat")
-const registerNewMessage = require("./src/chat_handlers/registerNewMessage")
+
 const MyWebSocket = require("./src/web_socket/webSocket")
+const onlineUsers = require("./src/online_users_handler/onlineUsersHandler")
+const TCPServer = require("./src/TCP_connection/TCPServer")
 
 mongoose.connect("mongodb://localhost:27017/")
 
@@ -27,9 +24,6 @@ app.use(express.static("views/style")) // css files
 app.use(express.static("views/script")) // js files
 
 const viewsPath = path.join(__dirname, "views/html");
-
-let onlineUsers = []
-let tmpOnlineUsers = []
 
 
 app.use(async (req, res, next) => {
@@ -96,6 +90,9 @@ const port = Ports.appRunPort
 const server = app.listen(port)
 
 const ws = new MyWebSocket(server)
+const TCPServerInstance = new TCPServer()
+TCPServerInstance.listen()
+
 /*
 {
   action: {
@@ -106,28 +103,7 @@ const ws = new MyWebSocket(server)
 }
 */
 
-
-sendMyInfoPeriodically(5000)
-receiveUserInfo(data => {
-  if (data.ip != getIpAddress()) {
-    console.log("founded User: ", data.ip)
-
-    tmpOnlineUsers.push(data)
-  }
-})
-
 setInterval(() => {
-  onlineUsers = []
-
-  tmpOnlineUsers.forEach(item => {
-    onlineUsers.push({
-      username: item.message.username,
-      userId: item.message.userId
-    })
-  })
-
-  tmpOnlineUsers = []
-
   if (ws.send) {
     ws.send({
       action: "onlineUsers",
@@ -135,3 +111,15 @@ setInterval(() => {
     })
   }
 }, 10000)
+
+TCPServerInstance.addListener("data", message => {
+  if (ws.send) {
+    ws.send({
+      action: "receivedMessage",
+      data: {
+        userId: message.otherUserId,
+        content: message.data.content,
+      },
+    })
+  }
+})

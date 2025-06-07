@@ -17,7 +17,8 @@ const chatHistoryUsers = [
   { _id: 1, username: "مریم", imgSrc: "https://media.istockphoto.com/id/471926619/photo/moraine-lake-at-sunrise-banff-national-park-canada.jpg?s=612x612&w=0&k=20&c=mujiCtVk5QA697SD3d8V8BGmd91-8HlxCNHkolEA0Bo="},
   { _id: 2, username: "رضا", imgSrc: "https://media.istockphoto.com/id/471926619/photo/moraine-lake-at-sunrise-banff-national-park-canada.jpg?s=612x612&w=0&k=20&c=mujiCtVk5QA697SD3d8V8BGmd91-8HlxCNHkolEA0Bo="},
 ]
-const currChatUser = -1
+
+let currChatUserId = -1
 
 
 
@@ -148,6 +149,7 @@ function initWebSocket() {
         break
 
       case "receivedMessage":
+        receiveMessageHandler(data.data)
         break
 
       default:
@@ -171,6 +173,14 @@ function initWebSocket() {
 }
 
 
+function receiveMessageHandler(data) {
+  if (data.userId == currChatUserId) {
+
+  } else {
+    
+  }
+}
+
 function getCurrUserInfo() {
   fetch("/user-session")
     .then(res => res.json())
@@ -179,12 +189,23 @@ function getCurrUserInfo() {
     })
 }
 
+function enableMessage() {
+  sendMsgBtn.disabled = false
+  inputMsgElem.disabled = false
+}
+
+function disableMessage() {
+  sendMsgBtn.disabled = true
+  inputMsgElem.disabled = true
+}
+
 
 function initDashboard() {
   getCurrUserInfo()
   chatOnlineViewHandler([])
   chatHistoryViewHandler()
   chatMessagesViewHandler()
+  disableMessage()
 
   chatOnlineListElem.addEventListener("click", event => {
     if (event.target.classList.contains("user-item")) {
@@ -201,7 +222,19 @@ function initDashboard() {
   })
 
   sendMsgBtn.addEventListener("click", () => {
-    console.log(inputMsgElem.value.trim())
+    if (currChatUserId != -1) {
+      const content = inputMsgElem.value.trim()
+      const message = {
+        action: "sendMessage",
+        data: {
+          userId: currChatUserId,
+          content,
+        }
+      }
+
+      ws.send(JSON.stringify(message))
+    }
+
     inputMsgElem.value = ''
   })
 
