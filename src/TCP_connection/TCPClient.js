@@ -2,7 +2,7 @@
 // Mahdi Salehi
 
 const net = require('net');
-const { TCPSendPort } = require("../../config/config") 
+const { Ports } = require("../../config/config") 
 
 class TCPClient {
   /**
@@ -11,7 +11,7 @@ class TCPClient {
    */
   constructor(ip) {
     this.ip = ip;
-    this.port = TCPSendPort;
+    this.port = Ports.TCPSendPort;
     // Create a new TCP client socket.
     this.client = new net.Socket();
   }

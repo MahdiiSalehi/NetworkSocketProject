@@ -18,6 +18,8 @@ const chatHistoryUsers = [
   { _id: 2, username: "رضا", imgSrc: "https://media.istockphoto.com/id/471926619/photo/moraine-lake-at-sunrise-banff-national-park-canada.jpg?s=612x612&w=0&k=20&c=mujiCtVk5QA697SD3d8V8BGmd91-8HlxCNHkolEA0Bo="},
 ]
 
+let chatOnlineUsers
+
 let currChatUserId = -1
 
 
@@ -40,12 +42,14 @@ function chatOnlineItemTemplate(user) {
   `)
 }
 
-function chatOnlineViewHandler(chatOnlineUsers) {
+function chatOnlineViewHandler(newOnlineUsers) {
   // const chatOnlineUsers = [
   //   { _id: 0, username: "علی", imgSrc: "https://media.istockphoto.com/id/471926619/photo/moraine-lake-at-sunrise-banff-national-park-canada.jpg?s=612x612&w=0&k=20&c=mujiCtVk5QA697SD3d8V8BGmd91-8HlxCNHkolEA0Bo="},
   //   { _id: 1, username: "مریم", imgSrc: "https://media.istockphoto.com/id/471926619/photo/moraine-lake-at-sunrise-banff-national-park-canada.jpg?s=612x612&w=0&k=20&c=mujiCtVk5QA697SD3d8V8BGmd91-8HlxCNHkolEA0Bo="},
   //   { _id: 2, username: "رضا", imgSrc: "https://media.istockphoto.com/id/471926619/photo/moraine-lake-at-sunrise-banff-national-park-canada.jpg?s=612x612&w=0&k=20&c=mujiCtVk5QA697SD3d8V8BGmd91-8HlxCNHkolEA0Bo="},
   // ]
+
+  chatOnlineUsers = newOnlineUsers
 
   let chatOnlineHTML = ''
 
@@ -84,17 +88,14 @@ function chatMessageTemplate(isMyMessage, message) {
 }
 
 
-function chatMessagesViewHandler() {
-  const chatMessages = [
-    { _id: 0, content: "سلام، چطوری؟" },
-    { _id: 1, content: "خوبم، ممنون!" },
-    { _id: 1, content: "تو چطوری؟!" },
-  ]
+async function chatMessagesViewHandler() {
+  const res = await fetch(`/chat-messages/${currChatUserId}`)
+  const chatMessages = await res.json()
 
   let chatMessagesHTML = ''
 
   chatMessages.forEach(chatMessage => {
-    chatMessagesHTML += chatMessageTemplate(chatMessage._id, chatMessage.content)
+    chatMessagesHTML += chatMessageTemplate(chatMessage.userId != currChatUserId, chatMessage.content)
   })
 
   chatMessagesViewElem.textContent = ''
@@ -109,7 +110,7 @@ function chatHistoryItemTemplate(user) {
   // `)
 
   return (`
-    <li data-userid=${user._id} class="user-item flex items-center space-x-2 p-2 border rounded hover:bg-gray-100 cursor-pointer">
+    <li data-userid=${user._id} data-username=${user.username} class="user-item flex items-center space-x-2 p-2 border rounded hover:bg-gray-100 cursor-pointer">
       <div class="w-8 h-8 bg-gray-300 rounded-full overflow-hidden me-1">
         <img
           class="w-full h-full object-cover"
@@ -177,7 +178,48 @@ function receiveMessageHandler(data) {
   if (data.userId == currChatUserId) {
 
   } else {
-    
+    // show notife for user
+    getNotificationPremission()
+    showNotification(data.username, data.content)
+  }
+}
+
+function showNotification(title, body) {
+  // Check if notifications are supported.
+  if (!("Notification" in window)) {
+    console.log("This browser does not support system notifications.");
+    return;
+  }
+
+  // If permission has already been granted, create a notification.
+  if (Notification.permission === "granted") {
+    new Notification(title, { body });
+  }
+  // If not, ask for permission and then display if granted.
+  else if (Notification.permission !== "denied") {
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        new Notification(title, { body });
+      }
+    });
+  }
+}
+
+function setCurrChat(userId, username) {
+  currChatTitleElem.textContent = username
+  currChatUserId = userId
+  chatMessagesViewHandler()
+}
+
+
+function getNotificationPremission() {
+  // Check if the browser supports notifications.
+  if ("Notification" in window) {
+    if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+      Notification.requestPermission().then(permission => {
+        console.log("Notification permission:", permission);
+      });
+    }
   }
 }
 
@@ -204,20 +246,35 @@ function initDashboard() {
   getCurrUserInfo()
   chatOnlineViewHandler([])
   chatHistoryViewHandler()
-  chatMessagesViewHandler()
+  // chatMessagesViewHandler()
   disableMessage()
 
   chatOnlineListElem.addEventListener("click", event => {
     if (event.target.classList.contains("user-item")) {
       const userId = event.target.dataset.userid
-      console.log(userId)
+      const username = event.target.dataset.username
+    
+      setCurrChat(userId, username)
+
+      enableMessage()
     }
   })
 
   chatHistoryListElem.addEventListener("click", event => {
     if (event.target.classList.contains("user-item")) {
       const userId = event.target.dataset.userid
-      console.log(userId)
+      const username = event.target.dataset.username
+    
+      setCurrChat(userId, username)
+
+      disableMessage()
+
+      chatOnlineUsers.some(user => {
+        if (user.userId == userId) {
+          enableMessage()
+          return true
+        }
+      })
     }
   })
 

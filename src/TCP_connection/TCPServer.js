@@ -4,13 +4,14 @@
 // TCPServer.js
 const net = require('net');
 const { EventEmitter } = require('stream');
-const { TCPListenPort } = require("../../config/config"); 
+const { Ports } = require("../../config/config"); 
 const onlineUsers = require('../online_users_handler/onlineUsersHandler');
 const insertMessage = require('../chat_handlers/insertMessage');
 
 class TCPServer extends EventEmitter {
   constructor() {
-    this.port = TCPListenPort;
+    super()
+    this.port = Ports.TCPListenPort;
     // Create the TCP server and bind the connection callback.
     this.server = net.createServer(this.handleConnection.bind(this));
   }
@@ -49,6 +50,7 @@ class TCPServer extends EventEmitter {
     onlineUsers.some(user => {
       if (user.ip == parsedMessage.ip) {
         parsedMessage.otherUserId = user.userId
+        parsedMessage.otherUsername = user.username
         return true
       }
     })

@@ -7,3 +7,5 @@ set /a "broadcastSendPort=%PORT% + 1"
 set /a "broadcastListenPort=%PORT% + 2"
 set /a "TCPSendPort=%PORT% + 3"
 set /a "TCPListenPort=%PORT% + 4"
+
+set /a "mongodbPort=27018"

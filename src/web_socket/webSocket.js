@@ -21,7 +21,7 @@ class MyWebSocket {
       ws.on("message", this.messageReceiveHandler);
 
       ws.on("close", () => {
-        console.log("یک کلاینت قطع اتصال کرد");
+        console.log("WebSocket Closed");
       });
 
       ws.on("error", (err) => {

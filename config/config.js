@@ -12,7 +12,8 @@ const Ports = {
 const Routes = {
   signup: "/sign-up",
   dashboard: "/dashboard",
-  userSession: "/user-session"
+  userSession: "/user-session",
+  chatMessages: "/chat-messages"
 }
 
 

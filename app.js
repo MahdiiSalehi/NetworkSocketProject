@@ -14,8 +14,11 @@ const UserSession = require("./src/model/user_session/schema")
 const MyWebSocket = require("./src/web_socket/webSocket")
 const onlineUsers = require("./src/online_users_handler/onlineUsersHandler")
 const TCPServer = require("./src/TCP_connection/TCPServer")
+const getChatMessages = require("./src/chat_handlers/chatMessages")
 
-mongoose.connect("mongodb://localhost:27017/")
+const mongodbPort = process.env.mongodbPort
+
+mongoose.connect(`mongodb://localhost:${mongodbPort ?? "27017"}/`)
 
 const app = express()
 
@@ -80,6 +83,12 @@ app.get(Routes.userSession, async (req, res) => {
   res.send(data)
 })
 
+app.get(`${Routes.chatMessages}/:userId`, async (req, res) => {
+  const receiverId = req.params.userId;
+  const messages = await getChatMessages(receiverId)
+  res.send(messages)
+})
+
 
 app.use((req, res) => {
   res.status(404).sendFile("404.html", { root: viewsPath })
@@ -118,6 +127,7 @@ TCPServerInstance.addListener("data", message => {
       action: "receivedMessage",
       data: {
         userId: message.otherUserId,
+        username: message.otherUsername,
         content: message.data.content,
       },
     })

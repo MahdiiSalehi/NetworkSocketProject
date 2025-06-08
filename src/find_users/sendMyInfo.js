@@ -13,6 +13,11 @@ let userInfo = {};
 (async function() {
   const userSession = await UserSession.findOne({})
 
+  if (!userSession) {
+    console.log("Any User Not Registered")
+    return
+  }
+
   userInfo = {
     username: userSession.userData.username,
     userId: userSession.userId,
