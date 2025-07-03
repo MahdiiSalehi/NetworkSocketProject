@@ -6,7 +6,7 @@ const express = require("express")
 const mongoose = require("mongoose")
 
 
-const { Ports, Routes } = require("./config/config")
+const { Ports, Routes, mongodbURL } = require("./config/config")
 const checkAuthentication = require("./src/auth/checkAuthentication")
 const signup = require("./src/auth/sign-up")
 const UserSession = require("./src/model/user_session/schema")
@@ -16,9 +16,10 @@ const onlineUsers = require("./src/online_users_handler/onlineUsersHandler")
 const TCPServer = require("./src/TCP_connection/TCPServer")
 const getChatMessages = require("./src/chat_handlers/chatMessages")
 
-const mongodbPort = process.env.mongodbPort
+// const mongodbPort = process.env.mongodbPort
+// const mongodbURL = `mongodb://localhost:${mongodbPort ?? "27017"}/`
 
-mongoose.connect(`mongodb://localhost:${mongodbPort ?? "27017"}/`)
+mongoose.connect(mongodbURL)
 
 const app = express()
 

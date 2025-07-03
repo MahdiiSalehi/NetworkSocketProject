@@ -11,7 +11,7 @@ let tmpOnlineUsers = []
 
 sendMyInfoPeriodically(5000)
 receiveUserInfo(data => {
-  if ((data.ip != getIpAddress() && data.ip != "127.0.0.1") || false) {
+  if ((data.ip != getIpAddress() && data.ip != "127.0.0.1")) {
     console.log("founded User: ", data.ip)
 
     let isExists = false
